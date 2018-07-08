@@ -1,0 +1,18 @@
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+
+.CodeMirror-focused div.CodeMirror-cursors {
+    color: red;
+
+}
+
+.cm-s-vibrant-ink .CodeMirror-cursor {
+    border-left: 10px solid silver;
+    margin-left: 2px;
+}
+
