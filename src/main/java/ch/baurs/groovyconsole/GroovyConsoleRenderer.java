@@ -4,8 +4,10 @@ class GroovyConsoleRenderer {
 
     private final String formAction;
     private final String statusUrl;
+    private String prompt;
 
-    public GroovyConsoleRenderer() {
+    public GroovyConsoleRenderer(String prompt) {
+        this.prompt = prompt;
         formAction = UrlHelper.createUrl("execute");
         statusUrl = UrlHelper.createUrl("status");
     }
@@ -37,6 +39,7 @@ class GroovyConsoleRenderer {
                 .append(renderJs("codemirror-5.38.0/lib/codemirror.js"))
                 .append(renderJs("codemirror-5.38.0/mode/groovy/groovy.js"))
                 .append(renderJs("codemirror-5.38.0/addon/edit/matchbrackets.js"))
+                .append(renderJs("polyfill.js"))
                 .append(renderJs("groovyconsole.js"))
                 .append("\n")
                 .append("    </head>\n");
@@ -45,7 +48,7 @@ class GroovyConsoleRenderer {
 
     private void renderBody(StringBuilder out) {
         out.append("    <body>\n");
-        out.append("    <div class='groovyConsole' data-theme='" + Application.getConfiguration().theme + "' data-status-url='" + statusUrl + "'>\n");
+        out.append("    <div class='groovyConsole' data-theme='" + Application.getConfiguration().theme + "' data-status-url='" + statusUrl + "' data-prompt='" + prompt + "'>\n");
         out.append("        <form action='" + formAction + "' method='post'>\n");
         out.append("            <textarea class='output'></textarea>\n");
         out.append("            <textarea class='input'></textarea>\n");

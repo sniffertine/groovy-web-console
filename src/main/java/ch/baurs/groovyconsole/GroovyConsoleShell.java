@@ -4,6 +4,7 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
+import lombok.ToString;
 import org.codehaus.groovy.control.CompilerConfiguration;
 
 import java.io.StringWriter;
@@ -56,6 +57,7 @@ class GroovyConsoleShell {
         return new GroovyShell(gcloader, sharedData, gcon);
     }
 
+    @ToString
     class Execution {
         public final String scriptText;
         public final String consoleOut;
@@ -65,15 +67,6 @@ class GroovyConsoleShell {
             this.scriptText = scriptText;
             this.consoleOut = consoleOut;
             this.result = result;
-        }
-
-        @Override
-        public String toString() {
-            return "Execution{" +
-                    "scriptText='" + scriptText + '\'' +
-                    ", consoleOut='" + consoleOut + '\'' +
-                    ", result=" + result +
-                    '}';
         }
     }
 }

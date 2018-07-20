@@ -4,9 +4,15 @@ var GroovyConsole = (function($) {
     var $mod;
     var cm_input;
     var cm_output;
+    var prompt;
+    var history;
 
     var init = function() {
         $mod = $(".groovyConsole");
+        prompt = $mod.data("prompt");
+        if (!prompt.endsWith(" ")) {
+            prompt += " ";
+        }
 
         var $input = $("textarea.input", $mod),
             $output = $("textarea.output", $mod),
@@ -48,8 +54,7 @@ var GroovyConsole = (function($) {
             });
 
         cm_input.on("keydown", function(cm, event) {
-            console.log(event);
-
+            //console.log(event);
 
             //ENTER --> submit
             if ( /*event.ctrlKey && */ event.keyCode == 13) {
@@ -75,6 +80,17 @@ var GroovyConsole = (function($) {
             return null;
         });
 
+        cm_input.on("change", function(cm, changeObj) {
+            assertPrompt();
+        });
+        cm_input.on("focus", function(cm, changeObj) {
+            assertPrompt();
+        });
+        cm_input.on("cursorActivity", function(cm, changeObj) {
+            assertPrompt();
+        });
+
+        cm_input.setSize('100%', '10000px');
         cm_input.focus();
 
         //handle form submits to send ajax POST request
@@ -83,10 +99,11 @@ var GroovyConsole = (function($) {
 
     var handleSubmit = function(e) {
         e.preventDefault();
-        var url = e.target.action;
+        var url = e.target.action,
+            value = cm_input.getValue().removeStart(prompt);
 
         $.post(url, {
-                code: cm_input.getValue()
+                code: value
             })
             .fail(function(a, b, c) {
                 alert(a);
@@ -99,11 +116,37 @@ var GroovyConsole = (function($) {
     };
 
     var saveStatus = function(data) {
-        cm_output.setValue(data);
-        cm_output.scrollTo(0, 10000000000000);
+        history = data.history;
 
-        cm_input.setValue("");
+        cm_output.setValue(data.out);
+        cm_output.scrollTo(0, 10000000000000); //scroll down to the end
+
+        //assert the content of cm_input starts with the prompt
+        cm_input.setValue(prompt);
         cm_input.focus();
+    };
+
+    var assertPrompt = function() {
+        var promptChars = prompt.split(''),
+            promptLength = prompt.length,
+            currentSelections = cm_input.listSelections();
+
+
+        //make sure the cursor is never placed inside the prompt
+        currentSelections.forEach(function(selection) {
+            console.log("selection: ", selection);
+
+            if (selection.anchor.line == 0 && selection.anchor.ch < promptLength) {
+                selection.anchor.ch = promptLength;
+            }
+            if (selection.head.line == 0 && selection.head.ch < promptLength) {
+                selection.head.ch = promptLength;
+            }
+
+        });
+
+        console.log("'" + cm_input.getValue() + "'");
+
     };
 
 

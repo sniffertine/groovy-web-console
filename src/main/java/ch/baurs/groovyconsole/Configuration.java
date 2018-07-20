@@ -27,6 +27,9 @@ class Configuration {
     public final Charset characterEncoding = Constants.UTF_8;
 
     @Builder.Default
-    public final String theme;
+    public final String theme = Constants.DEFAULT_THEME;
+
+    @Builder.Default
+    public final String prompt = Constants.DEFAULT_PROPMT;
 
 }

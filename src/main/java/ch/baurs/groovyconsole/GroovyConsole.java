@@ -12,9 +12,9 @@ class GroovyConsole {
     private final String resultPrompt;
 
     public GroovyConsole() {
-        this.renderer = new GroovyConsoleRenderer();
+        this.prompt = Application.getConfiguration().prompt + "$";
+        this.renderer = new GroovyConsoleRenderer(prompt);
         this.shell = new GroovyConsoleShell();
-        this.prompt = "console$";
         this.resultPrompt = "------->";
     }
 

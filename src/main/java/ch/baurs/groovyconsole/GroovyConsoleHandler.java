@@ -1,18 +1,15 @@
 package ch.baurs.groovyconsole;
 
 import groovy.lang.GroovySystem;
-import org.baswell.routes.RedirectTo;
-import org.baswell.routes.RequestParameters;
-import org.baswell.routes.Route;
-import org.baswell.routes.Routes;
+import org.baswell.routes.*;
+import org.json.JSONObject;
 
-import javax.json.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.StringWriter;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Routes(value = "/")
 public class GroovyConsoleHandler {
@@ -29,7 +26,7 @@ public class GroovyConsoleHandler {
         return getConsole(req).render();
     }
 
-    @Route(value = "execute", returnedStringIsContent = true)
+    @Route(value = "execute", returnedStringIsContent = true, contentType = MIMETypes.JSON)
     public String postExecute(HttpServletRequest req, RequestParameters parameters, HttpServletResponse resp) throws IOException {
         GroovyConsole console = getConsole(req);
 
@@ -39,7 +36,7 @@ public class GroovyConsoleHandler {
         return getStatus(req, resp);
     }
 
-    @Route(value = "status", returnedStringIsContent = true)
+    @Route(value = "status", returnedStringIsContent = true, contentType = MIMETypes.JSON)
     public String getStatus(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         GroovyConsole console = getConsole(req);
 
@@ -47,27 +44,14 @@ public class GroovyConsoleHandler {
         sb.append("Welcome to the Groovy Web Console! [Using Groovy version ").append(GroovySystem.getVersion()).append("]\n\n");
         sb.append(console.printExecutionState());
 
-        JsonObjectBuilder json = Json.createObjectBuilder();
-        json.add("out", sb.toString());
-        json.add("history", createHistoryJson(console.getHistory()));
+        Map<String, Object> data = new LinkedHashMap<String, Object>();
+        data.put("out", sb.toString());
+        data.put("history", console.getHistory());
 
-        StringWriter out = new StringWriter();
-        JsonWriter writer = Json.createWriter(out);
-        writer.write(json.build());
-        writer.close();
-        return out.toString();
+        JSONObject json = new JSONObject(data);
+
+        return json.toString(4);
     }
-
-    private JsonArray createHistoryJson(List<String> history) {
-        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-
-        for (String command : history) {
-            arrayBuilder.add(command);
-        }
-
-        return arrayBuilder.build();
-    }
-
 
     private GroovyConsole getConsole(HttpServletRequest req) {
         HttpSession session = req.getSession();

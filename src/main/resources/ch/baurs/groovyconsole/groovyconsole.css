@@ -13,6 +13,6 @@ html, body {
 
 .cm-s-vibrant-ink .CodeMirror-cursor {
     border-left: 10px solid silver;
-    margin-left: 2px;
+    margin-left: 0px;
 }
 

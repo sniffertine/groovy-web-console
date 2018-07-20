@@ -9,4 +9,6 @@ class Constants {
     public static final String ASSETS_URL_PREFIX = "assets/";
 
     public static final String DEFAULT_THEME = "vibrant-ink";
+
+    public static final String DEFAULT_PROPMT = "gc";
 }
