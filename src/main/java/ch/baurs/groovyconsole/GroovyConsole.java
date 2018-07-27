@@ -1,6 +1,8 @@
 package ch.baurs.groovyconsole;
 
 
+import groovyjarjarantlr.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,14 +10,12 @@ class GroovyConsole {
 
     private final GroovyConsoleRenderer renderer;
     private final GroovyConsoleShell shell;
-    private final String prompt;
     private final String resultPrompt;
 
     public GroovyConsole() {
-        this.prompt = Application.getConfiguration().prompt + "$";
-        this.renderer = new GroovyConsoleRenderer(prompt);
+        this.renderer = new GroovyConsoleRenderer();
         this.shell = new GroovyConsoleShell();
-        this.resultPrompt = "------->";
+        this.resultPrompt = StringUtil.repeat("-", Application.getConfiguration().prompt.length()-1)+">";
     }
 
     public String render() {
@@ -31,7 +31,7 @@ class GroovyConsole {
         StringBuilder sb = new StringBuilder();
 
         for (GroovyConsoleShell.Execution execution : shell.getExecutions()) {
-            sb.append(prompt).append(" ").append(execution.scriptText).append("\n");
+            sb.append(Application.getConfiguration().prompt).append(" ").append(execution.scriptText).append("\n");
 
             String consoleOut = toString(execution.consoleOut);
             String consoleResult = toString(execution.result);

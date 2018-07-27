@@ -1,48 +1,69 @@
 "use strict";
 
 var GroovyConsole = (function($) {
-    var $mod;
-    var cm_input;
-    var cm_output;
+    var theme;
+    var statusUrl;
+    var formAction;
     var prompt;
+    var $mod;
+    var $form;
+    var $output;
+    var $prompt;
+    var $input;
+
+    var cm_output;
+    var cm_prompt;
+    var cm_input;
     var history;
 
     var init = function() {
         $mod = $(".groovyConsole");
-        prompt = $mod.data("prompt");
-        if (!prompt.endsWith(" ")) {
-            prompt += " ";
-        }
+        initMarkup($mod);
 
-        var $input = $("textarea.input", $mod),
-            $output = $("textarea.output", $mod),
-            $form = $("form", $mod),
-            theme = $mod.data("theme"),
-            statusUrl = $mod.data("status-url");
+        // init output
+        cm_output = CodeMirror.fromTextArea($output[0], {
+            mode: "text/x-groovy",
+            scrollbarStyle: "null",
+            lineNumbers: false,
+            theme: theme,
+
+            matchBrackets: false,
+            viewportMargin: Infinity,
+            readOnly: true
+        });
+
+        // init prompt
+        cm_prompt = CodeMirror.fromTextArea($prompt[0], {
+            mode: "text/x-groovy",
+            scrollbarStyle: "null",
+            lineNumbers: false,
+            theme: theme,
+
+            matchBrackets: false,
+            readOnly: true
+        });
 
         // init input
         cm_input = CodeMirror.fromTextArea($input[0], {
             mode: "text/x-groovy",
-            lineNumbers: false,
-            matchBrackets: true,
-            scrollbarStyle: null,
-            cursorBlinkRate: 800,
-            theme: theme,
             scrollbarStyle: "null",
-            //value: "test",
+            lineNumbers: false,
+            theme: theme,
+
+            lineWrapping: true,
+            matchBrackets: true,
+            cursorBlinkRate: 800,
             readOnly: false
         });
-        // init output
-        cm_output = CodeMirror.fromTextArea($output[0], {
-            mode: "text/x-groovy",
-            lineNumbers: false,
-            matchBrackets: false,
-            theme: theme,
-            scrollbarStyle: "null",
-            //value: "test",
-            readOnly: true
-        });
 
+
+        //set value of prompt
+        cm_prompt.setValue(prompt);
+        var pixels = (prompt.length + 1) * cm_prompt.defaultCharWidth();
+        console.log("pixels: ", pixels);
+        cm_prompt.setSize(pixels +'px', '100000px');
+
+        //set status
         $.get(statusUrl)
             .fail(function(a, b, c) {
                 alert(a);
@@ -53,48 +74,65 @@ var GroovyConsole = (function($) {
                 saveStatus(data);
             });
 
-        cm_input.on("keydown", function(cm, event) {
-            //console.log(event);
+        //submit form on ENTER
+        cm_input.on("keydown", function(cm, e) {
+            //console.log(e);
 
             //ENTER --> submit
-            if ( /*event.ctrlKey && */ event.keyCode == 13) {
+            if (!e.shiftKey && e.keyCode == 13) {
+                e.preventDefault();
                 $form.submit();
             }
         });
-        cm_input.on("beforeChange", function(cm, changeObj) {
-            var typedNewLine = changeObj.origin == '+input' && typeof changeObj.text == "object" && changeObj.text.join("") == "";
+        cm_input.on("beforeChange___", function(cm, e) {
+            var typedNewLine = e.origin == '+input' && typeof e.text == "object" && e.text.join("") == "";
             if (typedNewLine) {
-                return changeObj.cancel();
+                return e.cancel();
             }
 
-            var pastedNewLine = changeObj.origin == 'paste' && typeof changeObj.text == "object" && changeObj.text.length > 1;
+            var pastedNewLine = e.origin == 'paste' && typeof e.text == "object" && e.text.length > 1;
             if (pastedNewLine) {
-                var newText = changeObj.text.join(" ");
+                var newText = e.text.join(" ");
 
                 // trim
                 newText = $.trim(newText);
 
-                return changeObj.update(null, null, [newText]);
+                return e.update(null, null, [newText]);
             }
 
             return null;
         });
 
-        cm_input.on("change", function(cm, changeObj) {
+        cm_input.on("change___", function(cm, e) {
             assertPrompt();
         });
-        cm_input.on("focus", function(cm, changeObj) {
+        cm_input.on("focus___", function(cm, e) {
             assertPrompt();
         });
-        cm_input.on("cursorActivity", function(cm, changeObj) {
+        cm_input.on("cursorActivity___", function(cm, e) {
             assertPrompt();
         });
 
-        cm_input.setSize('100%', '10000px');
+        //cm_input.setSize('100%', '10000px');
         cm_input.focus();
 
         //handle form submits to send ajax POST request
         $form.submit(handleSubmit);
+    };
+
+    var initMarkup = function($mod) {
+        theme = $mod.data("theme");
+        statusUrl = $mod.data("status-url");
+        formAction = $mod.data("form-action");
+        prompt = $mod.data("prompt");
+
+        $form = $("<form method='post'></form>").appendTo($mod).attr('action', formAction);
+        var $row1 = $("<div class='row1'></div>").appendTo($form);
+        var $row2 = $("<div class='row2'></div>").appendTo($form);
+
+        $output = $("<textarea class='output'></textarea>").appendTo($row1);
+        $prompt = $("<textarea class='prompt'></textarea>").appendTo($row2);
+        $input = $("<textarea class='input'></textarea>").appendTo($row2);
     };
 
     var handleSubmit = function(e) {
@@ -122,7 +160,7 @@ var GroovyConsole = (function($) {
         cm_output.scrollTo(0, 10000000000000); //scroll down to the end
 
         //assert the content of cm_input starts with the prompt
-        cm_input.setValue(prompt);
+        cm_input.setValue("");
         cm_input.focus();
     };
 

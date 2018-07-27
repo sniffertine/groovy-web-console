@@ -4,12 +4,14 @@ class GroovyConsoleRenderer {
 
     private final String formAction;
     private final String statusUrl;
+    private String theme;
     private String prompt;
 
-    public GroovyConsoleRenderer(String prompt) {
-        this.prompt = prompt;
+    public GroovyConsoleRenderer() {
         formAction = UrlHelper.createUrl("execute");
         statusUrl = UrlHelper.createUrl("status");
+        theme = Application.getConfiguration().theme;
+        prompt = Application.getConfiguration().prompt;
     }
 
     public String render() {
@@ -48,13 +50,12 @@ class GroovyConsoleRenderer {
 
     private void renderBody(StringBuilder out) {
         out.append("    <body>\n");
-        out.append("    <div class='groovyConsole' data-theme='" + Application.getConfiguration().theme + "' data-status-url='" + statusUrl + "' data-prompt='" + prompt + "'>\n");
-        out.append("        <form action='" + formAction + "' method='post'>\n");
-        out.append("            <textarea class='output'></textarea>\n");
-        out.append("            <textarea class='input'></textarea>\n");
-//        out.append("            <button>submit</button>\n");
-        out.append("        </form>\n");
-        out.append("    </div>\n");
+        out.append("        <div class='groovyConsole'");
+        out.append(" data-status-url='" + statusUrl + "'");
+        out.append(" data-form-action='" + formAction + "'");
+        out.append(" data-theme='" + theme + "'");
+        out.append(" data-prompt='" + prompt + "'");
+        out.append(" ></div>\n");
         out.append("    </body>\n");
         out.append("</html>\n");
     }
