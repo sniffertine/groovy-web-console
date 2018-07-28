@@ -57,11 +57,15 @@ var GroovyConsole = (function($) {
         });
 
 
-        //set value of prompt
+        //set value and size of prompt
         cm_prompt.setValue(prompt);
         var pixels = (prompt.length + 1) * cm_prompt.defaultCharWidth();
         console.log("pixels: ", pixels);
         cm_prompt.setSize(pixels +'px', '100000px');
+
+        //set cursor width
+        $('.cm-s-vibrant-ink .CodeMirror-cursor', $mod).css('border-left-width', cm_prompt.defaultCharWidth()+ 'px');
+
 
         //set status
         $.get(statusUrl)
@@ -78,10 +82,21 @@ var GroovyConsole = (function($) {
         cm_input.on("keydown", function(cm, e) {
             //console.log(e);
 
-            //ENTER --> submit
-            if (!e.shiftKey && e.keyCode == 13) {
-                e.preventDefault();
-                $form.submit();
+            if (!e.shiftKey) {
+
+                //ENTER --> submit
+                if(e.code == 'Enter'){
+                    e.preventDefault();
+                    $form.submit();
+                }
+                if(e.code == 'ArrowUp'){
+                    e.preventDefault();
+                    console.log(history);
+                }
+                if(e.code == 'ArrowDown'){
+                    e.preventDefault();
+                    console.log(history);
+                }
             }
         });
         cm_input.on("beforeChange___", function(cm, e) {

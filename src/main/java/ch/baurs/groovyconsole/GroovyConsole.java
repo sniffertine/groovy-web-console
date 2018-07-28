@@ -1,13 +1,12 @@
 package ch.baurs.groovyconsole;
 
 
-import groovyjarjarantlr.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
 class GroovyConsole {
 
+    public static final String NL = "\n";
     private final GroovyConsoleRenderer renderer;
     private final GroovyConsoleShell shell;
     private final String resultPrompt;
@@ -15,7 +14,7 @@ class GroovyConsole {
     public GroovyConsole() {
         this.renderer = new GroovyConsoleRenderer();
         this.shell = new GroovyConsoleShell();
-        this.resultPrompt = StringUtil.repeat("-", Application.getConfiguration().prompt.length()-1)+">";
+        this.resultPrompt = StringUtil.repeat("-", Application.getConfiguration().prompt.length() - 1) + ">";
     }
 
     public String render() {
@@ -31,14 +30,14 @@ class GroovyConsole {
         StringBuilder sb = new StringBuilder();
 
         for (GroovyConsoleShell.Execution execution : shell.getExecutions()) {
-            sb.append(Application.getConfiguration().prompt).append(" ").append(execution.scriptText).append("\n");
+            sb.append(Application.getConfiguration().prompt).append(" ").append(execution.scriptText).append(NL);
 
             String consoleOut = toString(execution.consoleOut);
             String consoleResult = toString(execution.result);
-            sb.append(resultPrompt).append(" ").append(consoleOut).append(consoleResult).append("\n");
+            sb.append(resultPrompt).append(" ").append(consoleOut).append(consoleResult).append(NL);
         }
 
-        return sb.toString();
+        return StringUtil.removeEnd(sb.toString(), NL);
     }
 
     private static String toString(Object string) {
