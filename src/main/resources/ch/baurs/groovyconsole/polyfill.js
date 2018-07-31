@@ -18,6 +18,7 @@ if (!String.prototype.endsWith) {
         return lastIndex !== -1 && lastIndex === position;
     };
 }
+
 if (!String.prototype.removeStart) {
     String.prototype.removeStart = function(start) {
         if (this.startsWith(start)) {

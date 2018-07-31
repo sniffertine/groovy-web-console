@@ -15,6 +15,8 @@ var GroovyConsole = (function($) {
     var cm_prompt;
     var cm_input;
     var history;
+    var currentHistoryIndex;
+    var maxHistoryIndex;
 
     var init = function() {
         $mod = $(".groovyConsole");
@@ -60,19 +62,14 @@ var GroovyConsole = (function($) {
         //set value and size of prompt
         cm_prompt.setValue(prompt);
         var pixels = (prompt.length + 1) * cm_prompt.defaultCharWidth();
-        console.log("pixels: ", pixels);
-        cm_prompt.setSize(pixels +'px', '100000px');
-
-        //set cursor width
-        $('.cm-s-vibrant-ink .CodeMirror-cursor', $mod).css('border-left-width', cm_prompt.defaultCharWidth()+ 'px');
+        cm_prompt.setSize(pixels + 'px', '100000px');
 
 
         //set status
         $.get(statusUrl)
-            .fail(function(a, b, c) {
-                alert(a);
-                alert(b);
-                alert(c);
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                console.log("Error: ", textStatus, errorThrown);
+                alert("Server Error: " + textStatus)
             })
             .done(function(data) {
                 saveStatus(data);
@@ -80,55 +77,42 @@ var GroovyConsole = (function($) {
 
         //submit form on ENTER
         cm_input.on("keydown", function(cm, e) {
-            //console.log(e);
 
             if (!e.shiftKey) {
 
                 //ENTER --> submit
-                if(e.code == 'Enter'){
+                if (e.code == 'Enter') {
                     e.preventDefault();
                     $form.submit();
                 }
-                if(e.code == 'ArrowUp'){
+
+                // navigate the history up
+                if (e.code == 'ArrowUp') {
                     e.preventDefault();
-                    console.log(history);
+                    navigateHistory(Math.max(0, currentHistoryIndex - 1));
                 }
-                if(e.code == 'ArrowDown'){
+                // navigate the history down
+                if (e.code == 'ArrowDown') {
                     e.preventDefault();
-                    console.log(history);
+                    navigateHistory(Math.min(history.length - 1, currentHistoryIndex + 1));
                 }
-            }
-        });
-        cm_input.on("beforeChange___", function(cm, e) {
-            var typedNewLine = e.origin == '+input' && typeof e.text == "object" && e.text.join("") == "";
-            if (typedNewLine) {
-                return e.cancel();
+
             }
 
-            var pastedNewLine = e.origin == 'paste' && typeof e.text == "object" && e.text.length > 1;
-            if (pastedNewLine) {
-                var newText = e.text.join(" ");
-
-                // trim
-                newText = $.trim(newText);
-
-                return e.update(null, null, [newText]);
+            //ctrl + c will reset the current command
+            if (e.ctrlKey && e.code == 'KeyC') {
+                e.preventDefault();
+                history[maxHistoryIndex] = '';
+                navigateHistory(maxHistoryIndex);
             }
-
-            return null;
         });
 
-        cm_input.on("change___", function(cm, e) {
-            assertPrompt();
-        });
-        cm_input.on("focus___", function(cm, e) {
-            assertPrompt();
-        });
-        cm_input.on("cursorActivity___", function(cm, e) {
-            assertPrompt();
+        //set cursor width
+        setCursorWidth(cm_input);
+        cm_input.on("cursorActivity", function(cm, e) {
+            setCursorWidth(cm_input);
         });
 
-        //cm_input.setSize('100%', '10000px');
         cm_input.focus();
 
         //handle form submits to send ajax POST request
@@ -169,15 +153,50 @@ var GroovyConsole = (function($) {
     };
 
     var saveStatus = function(data) {
-        history = data.history;
-
         cm_output.setValue(data.out);
         cm_output.scrollTo(0, 10000000000000); //scroll down to the end
+        cm_output.focus(); //do this to focus input again afterwards. This will scroll the cursor into view correctly.
 
-        //assert the content of cm_input starts with the prompt
-        cm_input.setValue("");
+        //init the history
+        history = data.history;
+        history.push(''); // add an entry for the current command
+        currentHistoryIndex = history.length - 1;
+        maxHistoryIndex = history.length - 1
+
+        cm_input.setValue('');
         cm_input.focus();
+
+        navigateHistory(maxHistoryIndex); //navigate to current history entry
     };
+
+    var navigateHistory = function(newIndex) {
+        var fixedNewIndex = Math.max(Math.min(newIndex, maxHistoryIndex), 0);
+
+        console.log('before history', history);
+        console.log('currentHistoryIndex', currentHistoryIndex);
+        console.log('newIndex', newIndex);
+        console.log('fixedNewIndex', fixedNewIndex);
+
+        //if moving away from current command, save it...
+        if (currentHistoryIndex == maxHistoryIndex) {
+            history[currentHistoryIndex] = cm_input.getValue();
+        }
+        currentHistoryIndex = fixedNewIndex;
+
+        cm_input.setValue(history[currentHistoryIndex]);
+
+        console.log('after history', history);
+
+        //set the cursor to the end
+        cm_input.setCursor(cm_input.lineCount(), 0);
+ };
+
+    var setCursorWidth = function(cm) {
+        setTimeout(function() {
+            $('.CodeMirror-cursor', $(cm.getWrapperElement())).css('border-left-width', cm.defaultCharWidth() + 'px');
+        }, 0);
+    };
+
 
     var assertPrompt = function() {
         var promptChars = prompt.split(''),
