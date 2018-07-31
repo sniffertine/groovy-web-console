@@ -49,7 +49,10 @@ class GroovyConsole {
 
         List<GroovyConsoleShell.Execution> executions = shell.getExecutions();
         for (GroovyConsoleShell.Execution execution : executions) {
-            result.add(execution.scriptText);
+            String scriptText = execution.scriptText;
+            if(StringUtil.isNotEmpty(scriptText)) {
+                result.add(scriptText);
+            }
         }
 
         return result;

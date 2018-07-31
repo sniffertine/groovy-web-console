@@ -61,21 +61,21 @@ var GroovyConsole = (function($) {
 
         //set value and size of prompt
         cm_prompt.setValue(prompt);
-        var pixels = (prompt.length + 1) * cm_prompt.defaultCharWidth();
-        cm_prompt.setSize(pixels + 'px', '100000px');
+        var promptLength = (prompt.length + 1) * cm_prompt.defaultCharWidth();
+        cm_prompt.setSize(promptLength + 'px', '100000px');
 
 
-        //set status
+        //init status from server
         $.get(statusUrl)
             .fail(function(jqXHR, textStatus, errorThrown) {
-                console.log("Error: ", textStatus, errorThrown);
+                //console.log("Error: ", textStatus, errorThrown);
                 alert("Server Error: " + textStatus)
             })
             .done(function(data) {
                 saveStatus(data);
             });
 
-        //submit form on ENTER
+
         cm_input.on("keydown", function(cm, e) {
 
             if (!e.shiftKey) {
@@ -103,6 +103,7 @@ var GroovyConsole = (function($) {
             if (e.ctrlKey && e.code == 'KeyC') {
                 e.preventDefault();
                 history[maxHistoryIndex] = '';
+                cm_input.setValue('');
                 navigateHistory(maxHistoryIndex);
             }
         });
@@ -155,7 +156,6 @@ var GroovyConsole = (function($) {
     var saveStatus = function(data) {
         cm_output.setValue(data.out);
         cm_output.scrollTo(0, 10000000000000); //scroll down to the end
-        cm_output.focus(); //do this to focus input again afterwards. This will scroll the cursor into view correctly.
 
         //init the history
         history = data.history;
@@ -172,11 +172,6 @@ var GroovyConsole = (function($) {
     var navigateHistory = function(newIndex) {
         var fixedNewIndex = Math.max(Math.min(newIndex, maxHistoryIndex), 0);
 
-        console.log('before history', history);
-        console.log('currentHistoryIndex', currentHistoryIndex);
-        console.log('newIndex', newIndex);
-        console.log('fixedNewIndex', fixedNewIndex);
-
         //if moving away from current command, save it...
         if (currentHistoryIndex == maxHistoryIndex) {
             history[currentHistoryIndex] = cm_input.getValue();
@@ -185,40 +180,14 @@ var GroovyConsole = (function($) {
 
         cm_input.setValue(history[currentHistoryIndex]);
 
-        console.log('after history', history);
-
         //set the cursor to the end
         cm_input.setCursor(cm_input.lineCount(), 0);
- };
+    };
 
     var setCursorWidth = function(cm) {
         setTimeout(function() {
             $('.CodeMirror-cursor', $(cm.getWrapperElement())).css('border-left-width', cm.defaultCharWidth() + 'px');
         }, 0);
-    };
-
-
-    var assertPrompt = function() {
-        var promptChars = prompt.split(''),
-            promptLength = prompt.length,
-            currentSelections = cm_input.listSelections();
-
-
-        //make sure the cursor is never placed inside the prompt
-        currentSelections.forEach(function(selection) {
-            console.log("selection: ", selection);
-
-            if (selection.anchor.line == 0 && selection.anchor.ch < promptLength) {
-                selection.anchor.ch = promptLength;
-            }
-            if (selection.head.line == 0 && selection.head.ch < promptLength) {
-                selection.head.ch = promptLength;
-            }
-
-        });
-
-        console.log("'" + cm_input.getValue() + "'");
-
     };
 
 

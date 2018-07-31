@@ -94,4 +94,8 @@ class StringUtil {
         return cs == null || cs.length() == 0;
     }
 
+    static boolean isNotEmpty(final CharSequence cs) {
+        return !isEmpty(cs);
+    }
+
 }
