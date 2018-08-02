@@ -8,7 +8,7 @@
     <packaging>jar</packaging>
     <name>Groovy Web Console</name>
     <description>A web-based Groovy console written as a pure Java Servlet / Filter</description>
-    <version>0.9.0</version>
+    <version>0.9.1-SNAPSHOT</version>
     <url>https://github.com/sniffertine/groovy-web-console</url>
 
     <properties>
@@ -39,7 +39,7 @@
         <url>https://github.com/sniffertine/groovy-web-console</url>
         <connection>scm:git:git://github.com/sniffertine/groovy-web-console.git</connection>
         <developerConnection>scm:git:git@github.com:sniffertine/groovy-web-console.git</developerConnection>
-      <tag>groovy-web-console-0.9.0</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <distributionManagement>
