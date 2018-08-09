@@ -1,0 +1,8 @@
+<servlet>
+    <servlet-name>myServlet</servlet-name>
+    <servlet-class>ch.baurs.groovyconsole.testwebapp.MyServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>myServlet</servlet-name>
+    <url-pattern>/myServlet/*</url-pattern>
+</servlet-mapping>

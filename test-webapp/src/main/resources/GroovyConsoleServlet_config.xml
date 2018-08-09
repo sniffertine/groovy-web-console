@@ -1,0 +1,30 @@
+<servlet>
+    <servlet-name>groovyConsoleServlet</servlet-name>
+    <servlet-class>ch.baurs.groovyconsole.GroovyConsoleServlet</servlet-class>
+    <init-param>
+        <param-name>mappingPath</param-name>
+        <param-value>/groovyConsoleServlet</param-value>
+    </init-param>
+    <init-param>
+        <param-name>theme</param-name>
+        <param-value>twilight</param-value>
+    </init-param>
+    <init-param>
+        <param-name>prompt</param-name>
+        <param-value>console via servlet $></param-value>
+    </init-param>
+    <!--
+            <init-param>
+                <param-name>ipAuth</param-name>
+                <param-value>127.0.0.1</param-value>
+            </init-param>
+            <init-param>
+                <param-name>envAuth</param-name>
+                <param-value>xxx=xxx</param-value>
+            </init-param>
+    -->
+</servlet>
+<servlet-mapping>
+    <servlet-name>groovyConsoleServlet</servlet-name>
+    <url-pattern>/groovyConsoleServlet/*</url-pattern>
+</servlet-mapping>

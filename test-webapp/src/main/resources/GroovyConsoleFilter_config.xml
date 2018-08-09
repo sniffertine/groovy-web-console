@@ -1,0 +1,31 @@
+<filter>
+    <filter-name>groovyConsoleFilter</filter-name>
+    <filter-class>ch.baurs.groovyconsole.GroovyConsoleFilter</filter-class>
+    <init-param>
+        <param-name>mappingPath</param-name>
+        <param-value>/groovyConsoleFilter</param-value>
+    </init-param>
+    <init-param>
+        <param-name>theme</param-name>
+        <param-value>twilight</param-value>
+    </init-param>
+    <init-param>
+        <param-name>prompt</param-name>
+        <param-value>console via filter $></param-value>
+    </init-param>
+    <!--
+            <init-param>
+                <param-name>ipAuth</param-name>
+                <param-value>127.0.0.1</param-value>
+            </init-param>
+            <init-param>
+                <param-name>envAuth</param-name>
+                <param-value>xxx=xxx</param-value>
+            </init-param>
+    -->
+</filter>
+<filter-mapping>
+    <filter-name>groovyConsoleFilter</filter-name>
+    <url-pattern>/groovyConsoleFilter/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+</filter-mapping>
