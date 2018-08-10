@@ -1,0 +1,43 @@
+html {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+    *, *:before, *:after {
+    -webkit-box-sizing: inherit;
+    -moz-box-sizing: inherit;
+    box-sizing: inherit;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* cursor */
+.cm-s-vibrant-ink .CodeMirror-cursor {
+    border-left: 10px solid silver;
+    margin-left: 0px;
+}
+
+.output {
+}
+.output + .CodeMirror {
+    height: auto;
+    width: 100%;
+}
+
+.prompt {
+}
+.prompt + .CodeMirror {
+    height: 100000px;
+    float: left;
+}
+
+.input {
+}
+.input + .CodeMirror {
+    height: 100000px;
+}
