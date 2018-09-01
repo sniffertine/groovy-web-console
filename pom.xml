@@ -8,7 +8,7 @@
     <packaging>pom</packaging>
     <name>Groovy Web Console Root</name>
     <description>Parent project for the groovy web console</description>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <url>https://github.com/sniffertine/groovy-web-console</url>
 
     <modules>
@@ -44,7 +44,7 @@
         <url>https://github.com/sniffertine/groovy-web-console</url>
         <connection>scm:git:git://github.com/sniffertine/groovy-web-console.git</connection>
         <developerConnection>scm:git:git@github.com:sniffertine/groovy-web-console.git</developerConnection>
-        <tag>groovy-web-console-root-1.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
