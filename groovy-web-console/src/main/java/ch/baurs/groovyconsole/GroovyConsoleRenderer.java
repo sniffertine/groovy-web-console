@@ -2,18 +2,6 @@ package ch.baurs.groovyconsole;
 
 class GroovyConsoleRenderer {
 
-    private final String formAction;
-    private final String statusUrl;
-    private String theme;
-    private String prompt;
-
-    public GroovyConsoleRenderer() {
-        formAction = UrlHelper.createUrl("execute");
-        statusUrl = UrlHelper.createUrl("status");
-        theme = Application.getConfiguration().theme;
-        prompt = Application.getConfiguration().prompt;
-    }
-
     public String render() {
         StringBuilder out = new StringBuilder();
         renderHead(out);
@@ -27,10 +15,10 @@ class GroovyConsoleRenderer {
         out.append("<!doctype html>\n")
                 .append("<html lang='en'>\n")
                 .append("    <head>\n")
-                .append("        <meta characterEncoding='utf-8'>\n")
+                .append("        <meta characterEncoding='" + Application.getConfiguration().characterEncoding + "'>\n")
                 .append("        <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>\n")
                 .append("        <title>Groovy Web Console</title>\n")
-                .append("        <meta name='description' content='A web-based Groovy console written as a pure Java Servlet'>\n")
+                .append("        <meta name='description' content='A web-based Groovy console written as a pure Java Servlet or Filter'>\n")
                 .append("        <meta name='viewport' content='width=device-width, initial-scale=1'>\n")
                 .append("\n")
                 .append(renderCss("codemirror-5.38.0/lib/codemirror.css"))
@@ -51,10 +39,10 @@ class GroovyConsoleRenderer {
     private void renderBody(StringBuilder out) {
         out.append("    <body>\n");
         out.append("        <div class='groovyConsole'");
-        out.append(" data-status-url='" + statusUrl + "'");
-        out.append(" data-form-action='" + formAction + "'");
-        out.append(" data-theme='" + theme + "'");
-        out.append(" data-prompt='" + prompt + "'");
+        out.append(" data-status-url='" + UrlHelper.createUrl("status") + "'");
+        out.append(" data-form-action='" + UrlHelper.createUrl("execute") + "'");
+        out.append(" data-theme='" + Application.getConfiguration().theme + "'");
+        out.append(" data-prompt='" + Application.getConfiguration().prompt + "'");
         out.append(" ></div>\n");
         out.append("    </body>\n");
         out.append("</html>\n");

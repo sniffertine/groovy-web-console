@@ -15,6 +15,11 @@
     <name>Groovy Web Console</name>
     <description>A web-based Groovy console written as a pure Java Servlet / Filter</description>
 
+    <properties>
+        <java.version.source>1.6</java.version.source>
+        <java.version.target>1.6</java.version.target>
+    </properties>
+
     <dependencies>
 
         <dependency>

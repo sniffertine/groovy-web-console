@@ -5,7 +5,7 @@ class AssetHelper {
 
     public static String createAssetUrl(String path) {
         String assetPath = UrlHelper.joinSegmentsToPath(
-                Application.getConfiguration().assetsUrlPrefix,
+                Constants.ASSETS_URL_PREFIX,
                 path
         );
 

@@ -1,6 +1,6 @@
 package ch.baurs.groovyconsole;
 
-public class NumberUtil {
+ class NumberUtil {
     public static Integer parseInt(String number, Integer defaultValue) {
         if (StringUtil.isNotBlank(number)) {
             try {

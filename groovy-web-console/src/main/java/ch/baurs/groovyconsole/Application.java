@@ -1,5 +1,6 @@
 package ch.baurs.groovyconsole;
 
+import lombok.Getter;
 import org.baswell.routes.RoutesConfiguration;
 import org.baswell.routes.RoutesEngine;
 import org.baswell.routes.RoutingTable;
@@ -7,17 +8,20 @@ import org.baswell.routes.RoutingTable;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.UUID;
 
 public class Application {
 
-    private static Application instance;
+    @Getter
+    private final UUID id;
+
+    final Configuration configuration;
+
     private final RoutesEngine router;
-    private final Configuration configuration;
 
     public Application(Configuration configuration) {
-        instance = this;
+        this.id = UUID.randomUUID();
         this.configuration = configuration;
         this.router = createRoutesEngine();
 
@@ -25,26 +29,35 @@ public class Application {
         LoggingHelper.info(getClass(), message);
     }
 
-    public static Application getInstance() {
-        return instance;
+    static Application getInstance() {
+        return RequestContext.getInstance().getApplication();
     }
 
-    public static Configuration getConfiguration() {
+    static Configuration getConfiguration() {
         return getInstance().configuration;
     }
 
     public boolean handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        RequestContext original = RequestContext.setInstance(req, resp, this);
         try {
-            //check if authentication fails. continue if not...
+            return doHandle(req, resp);
+        } finally {
+            RequestContext.setInstance(original);
+        }
+    }
+
+    protected boolean doHandle(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+        try {
+            //check if access fails. continue if not...
             configuration.authConfig.check(req, resp);
 
             boolean handled = router.process(req, resp);
             LoggingHelper.trace(getClass(), "handle request done. handled = " + handled);
             return handled;
-        } catch (AuthenticationException e) {
+        } catch (AccessException e) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);
 
-            LoggingHelper.warn(getClass(), "Authentication Error", e);
+            LoggingHelper.warn(getClass(), "Access Error", e);
 
             return true;
         }
@@ -62,19 +75,6 @@ public class Application {
         routingTable.build();
 
         return new RoutesEngine(routingTable);
-    }
-
-    private ApplicationScope getApplicationScope(HttpServletRequest req){
-        HttpSession session = req.getSession();
-        if (session.isNew()) {
-            session.setMaxInactiveInterval(24 * 3600); //24 hours
-        }
-        if (!(session.getAttribute(ATTR_GROOVY_CONSOLE) instanceof GroovyConsole)) {
-            session.setAttribute(ATTR_GROOVY_CONSOLE, new GroovyConsole());
-        }
-
-        return (GroovyConsole) session.getAttribute(ATTR_GROOVY_CONSOLE);
-
     }
 
 }

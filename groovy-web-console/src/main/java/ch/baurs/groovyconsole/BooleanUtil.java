@@ -18,7 +18,4 @@ class BooleanUtil {
         return defaultValue;
     }
 
-    static boolean defaultIfNull(Boolean boolValue, boolean defaultValue) {
-        return ObjectUtil.defaultIfNull(boolValue, defaultValue);
-    }
 }

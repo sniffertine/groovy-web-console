@@ -9,12 +9,19 @@ class GroovyConsole {
     public static final String NL = "\n";
     private final GroovyConsoleRenderer renderer;
     private final GroovyConsoleShell shell;
-    private final String resultPrompt;
+
+    private String resultPrompt;
+
+    private String getResultPrompt() {
+        if (resultPrompt == null) {
+            resultPrompt = StringUtil.repeat("-", Application.getConfiguration().prompt.length() - 1) + ">";
+        }
+        return resultPrompt;
+    }
 
     public GroovyConsole() {
         this.renderer = new GroovyConsoleRenderer();
         this.shell = new GroovyConsoleShell();
-        this.resultPrompt = StringUtil.repeat("-", Application.getConfiguration().prompt.length() - 1) + ">";
     }
 
     public String render() {
@@ -34,7 +41,7 @@ class GroovyConsole {
 
             String consoleOut = toString(execution.consoleOut);
             String consoleResult = toString(execution.result);
-            sb.append(resultPrompt).append(" ").append(consoleOut).append(consoleResult).append(NL);
+            sb.append(getResultPrompt()).append(" ").append(consoleOut).append(consoleResult).append(NL);
         }
 
         return StringUtil.removeEnd(sb.toString(), NL);
@@ -50,7 +57,7 @@ class GroovyConsole {
         List<GroovyConsoleShell.Execution> executions = shell.getExecutions();
         for (GroovyConsoleShell.Execution execution : executions) {
             String scriptText = execution.scriptText;
-            if(StringUtil.isNotEmpty(scriptText)) {
+            if (StringUtil.isNotEmpty(scriptText)) {
                 result.add(scriptText);
             }
         }

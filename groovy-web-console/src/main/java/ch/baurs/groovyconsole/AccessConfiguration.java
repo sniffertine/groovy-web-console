@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @Builder
 @ToString
-public class AuthenticationConfiguration {
+public class AccessConfiguration {
 
     @Builder.Default
     public final String ipAuth = null;
@@ -17,23 +17,23 @@ public class AuthenticationConfiguration {
     @Builder.Default
     public final String envAuth = null;
 
-    protected void check(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+    protected void check(HttpServletRequest request, HttpServletResponse response) throws AccessException {
         checkIpRestriction(request);
         checkEnvironmentRestriction(request);
     }
 
-    protected void checkIpRestriction(HttpServletRequest request) throws AuthenticationException {
+    protected void checkIpRestriction(HttpServletRequest request) throws AccessException {
         if (ipAuth != null) {
             String ip = request.getRemoteAddr();
 
             if (!ip.matches(ipAuth)) {
-                throw new AuthenticationException("IP restriction");
+                throw new AccessException("IP restriction");
             }
         }
 
     }
 
-    protected void checkEnvironmentRestriction(HttpServletRequest request) throws AuthenticationException {
+    protected void checkEnvironmentRestriction(HttpServletRequest request) throws AccessException {
         if (envAuth != null) {
             String[] parts = splitOrThrow(envAuth, "=", "Illegal envAuth configuration");
             String envAuthKey = parts[0];
@@ -42,14 +42,14 @@ public class AuthenticationConfiguration {
             String sysValue = System.getProperty(envAuthKey);
 
             if (sysValue == null || !sysValue.matches(envAuthValue)) {
-                throw new AuthenticationException("Environment restriction");
+                throw new AccessException("Environment restriction");
             }
         }
     }
 
-    private String[] splitOrThrow(String string, String splitBy, String errorMessage) throws AuthenticationException {
+    private String[] splitOrThrow(String string, String splitBy, String errorMessage) throws AccessException {
         if (string == null || !string.contains(splitBy)) {
-            throw new AuthenticationException(errorMessage);
+            throw new AccessException(errorMessage);
         }
 
         return string.split(splitBy);

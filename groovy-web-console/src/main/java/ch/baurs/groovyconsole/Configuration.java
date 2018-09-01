@@ -2,25 +2,24 @@ package ch.baurs.groovyconsole;
 
 
 import lombok.Builder;
+import lombok.Getter;
 import lombok.ToString;
 
 import java.nio.charset.Charset;
 
 @Builder
+@Getter
 @ToString
 public class Configuration {
 
     @Builder.Default
-    final AuthenticationConfiguration authConfig = AuthenticationConfiguration.builder().build();
+    final AccessConfiguration authConfig = AccessConfiguration.builder().build();
 
     @Builder.Default
     final String contextPath = "";
 
     @Builder.Default
     final String mappingPath = Constants.DEFAULT_MAPPING_PATH;
-
-    @Builder.Default
-    final String assetsUrlPrefix = Constants.ASSETS_URL_PREFIX;
 
     @Builder.Default
     final boolean inlineAssets = Constants.DEFAULT_INLINE_ASSETS;

@@ -13,7 +13,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AuthenticationConfigurationTest {
+public class AccessConfigurationTest {
 
     @Mock
     private HttpServletRequest request;
@@ -23,14 +23,14 @@ public class AuthenticationConfigurationTest {
 
     @Test
     public void testNoAuth() throws Exception {
-        AuthenticationConfiguration authConfig = AuthenticationConfiguration.builder().build();
+        AccessConfiguration authConfig = AccessConfiguration.builder().build();
 
         authConfig.check(request, response);
     }
 
     @Test
     public void testIpAuth() throws Exception {
-        AuthenticationConfiguration authConfig = AuthenticationConfiguration.builder()
+        AccessConfiguration authConfig = AccessConfiguration.builder()
                 .ipAuth("1\\.2\\.3\\.\\d")
                 .build();
 
@@ -44,7 +44,7 @@ public class AuthenticationConfigurationTest {
         try {
             authConfig.check(request, response);
             fail("2.2.3.5 should not be valid");
-        } catch (AuthenticationException e) {
+        } catch (AccessException e) {
             assertEquals("IP restriction", e.getMessage());
         }
 
@@ -53,7 +53,7 @@ public class AuthenticationConfigurationTest {
 
     @Test
     public void testEnvAuth() throws Exception {
-        AuthenticationConfiguration authConfig = AuthenticationConfiguration.builder()
+        AccessConfiguration authConfig = AccessConfiguration.builder()
                 .envAuth("envProperty=letMeIn")
                 .build();
 
@@ -68,19 +68,19 @@ public class AuthenticationConfigurationTest {
         try {
             authConfig.check(request, response);
             fail("envAuth should not match stayOut");
-        } catch (AuthenticationException e) {
+        } catch (AccessException e) {
             assertEquals("Environment restriction", e.getMessage());
         }
 
 
         //illegal config
-        authConfig = AuthenticationConfiguration.builder()
+        authConfig = AccessConfiguration.builder()
                 .envAuth("envPropertyIllegalFormat")
                 .build();
         try {
             authConfig.check(request, response);
             fail("envAuth should not work with illegal configuration");
-        } catch (AuthenticationException e) {
+        } catch (AccessException e) {
             assertEquals("Illegal envAuth configuration", e.getMessage());
         }
 
